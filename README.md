@@ -29,17 +29,20 @@ Description: Adds a new school to the database.
 Request Body:
 
 json
-Copy code
-[
-   {
 
-  "name": "School Name",
-  "address": "School Address",
-  "latitude": 12.9716,
-  "longitude": 77.5946
+Copy code
+
+
+  {
   
-   }
-]
+    "name": "School Name",
+    "address": "School Address",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    
+  }
+
+
 
 
 
