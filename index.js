@@ -21,7 +21,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 // Adding School API
-app.post('/addSchool', (req, res) => {
+app.post('/api/addSchool', (req, res) => {
     const { name, address, latitude, longitude } = req.body;
 
     // Validate input data
@@ -40,7 +40,7 @@ app.post('/addSchool', (req, res) => {
 });
 
 // Listing Schools API
-app.get('/listSchools', (req, res) => {
+app.get('/api/listSchools', (req, res) => {
     const { latitude, longitude } = req.query;
 
     if (!latitude || !longitude) {
