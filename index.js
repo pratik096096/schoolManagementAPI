@@ -1,13 +1,12 @@
-
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./db');  
+const db = require('./db');
 
 const app = express();
-app.use(bodyParser.json());  
+app.use(bodyParser.json());
 
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
+// Function to calculate the distance between two coordinates
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRadians = (degree) => degree * (Math.PI / 180);
     const R = 6371; // Radius of the earth in km
     const dLat = toRadians(lat2 - lat1);
@@ -18,29 +17,29 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in km
-}
+};
 
-// Adding School API
-app.post('/addSchool', (req, res) => {
+// API to add a new school
+app.post('/api/addSchool', async (req, res) => {
     const { name, address, latitude, longitude } = req.body;
 
-    // Validate input data
     if (!name || !address || !latitude || !longitude) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
     const query = 'INSERT INTO schools (name, address, latitude, longitude) VALUES (?, ?, ?, ?)';
-    db.query(query, [name, address, latitude, longitude], (err, result) => {
-        if (err) {
-            console.error('Error inserting data:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
+
+    try {
+        const [result] = await db.query(query, [name, address, latitude, longitude]);
         res.status(201).json({ message: 'School added successfully', schoolId: result.insertId });
-    });
+    } catch (error) {
+        console.error('Error inserting data:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
-// Listing Schools API
-app.get('/listSchools', (req, res) => {
+// API to list all schools within a specified distance
+app.get('/api/listSchools', async (req, res) => {
     const { latitude, longitude } = req.query;
 
     if (!latitude || !longitude) {
@@ -48,11 +47,9 @@ app.get('/listSchools', (req, res) => {
     }
 
     const query = 'SELECT * FROM schools';
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching data:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
+
+    try {
+        const [results] = await db.query(query);
 
         const userLatitude = parseFloat(latitude);
         const userLongitude = parseFloat(longitude);
@@ -62,11 +59,13 @@ app.get('/listSchools', (req, res) => {
             return { ...school, distance };
         });
 
-        // Sort schools by distance
         schools.sort((a, b) => a.distance - b.distance);
 
         res.status(200).json(schools);
-    });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Start the server
@@ -74,4 +73,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
