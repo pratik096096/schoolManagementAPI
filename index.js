@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./db');
+const db = require('./db');  // Import the promise-based DB connection pool
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,7 +20,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 // API to add a new school
-app.post('/api/addSchool', async (req, res) => {
+app.post('/addSchool', async (req, res) => {
     const { name, address, latitude, longitude } = req.body;
 
     if (!name || !address || !latitude || !longitude) {
@@ -39,7 +39,7 @@ app.post('/api/addSchool', async (req, res) => {
 });
 
 // API to list all schools within a specified distance
-app.get('/api/listSchools', async (req, res) => {
+app.get('/listSchools', async (req, res) => {
     const { latitude, longitude } = req.query;
 
     if (!latitude || !longitude) {
