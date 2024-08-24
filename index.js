@@ -1,8 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('./db');  // Import the promise-based DB connection pool
-
+const cors = require("cors");
 const app = express();
+
+app.use(cors());
 app.use(bodyParser.json());
 
 // Function to calculate the distance between two coordinates
